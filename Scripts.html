@@ -1,0 +1,304 @@
+<script>
+/**
+ * @file Scripts.html
+ * @description Client-side logic for the OxoHotel Dashboard.
+ */
+
+let APP_CONFIG = {};
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  loadDashboard();
+});
+
+/**
+ * Manages the light/dark theme.
+ */
+function initTheme() {
+  const themeToggle = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('oxo-theme') || 'light';
+  
+  // Set theme attribute immediately
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = (currentTheme === 'light') ? 'dark' : 'light';
+      setTheme(newTheme);
+    });
+  }
+}
+
+/**
+ * Sets the theme and updates the UI.
+ * @param {string} theme - 'light' or 'dark'.
+ */
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('oxo-theme', theme);
+  updateLogo(theme);
+}
+
+/**
+ * Updates the logo based on theme and config.
+ * @param {string} theme
+ */
+function updateLogo(theme) {
+  const logo = document.getElementById('brandLogo');
+  if (logo && APP_CONFIG.logoLight) {
+    const fileId = (theme === 'light') ? APP_CONFIG.logoLight : APP_CONFIG.logoDark;
+    logo.src = 'https://lh3.googleusercontent.com/d/' + fileId;
+    logo.style.opacity = 1;
+  }
+}
+
+/**
+ * Fetches data from the server and populates the dashboard.
+ */
+function loadDashboard() {
+  google.script.run
+    .withSuccessHandler((data) => {
+      APP_CONFIG = data.config;
+      renderGems(data.gems);
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      updateLogo(currentTheme);
+      
+      // Show/Hide Admin Panel Button
+      const adminBtn = document.getElementById('adminBtn');
+      if (adminBtn) {
+        if (data.user && data.user.isAdmin) {
+          adminBtn.classList.remove('hidden');
+          adminBtn.onclick = openAdminModal;
+        } else {
+          adminBtn.classList.add('hidden');
+        }
+      }
+
+      hideSkeletons();
+    })
+    .withFailureHandler((err) => {
+      console.error('Error loading dashboard:', err);
+    })
+    .getDashboardData();
+}
+
+/**
+ * Renders the gem cards.
+ * @param {Array} gems - List of gem objects.
+ */
+function renderGems(gems) {
+  const container = document.getElementById('gemsContainer');
+  const template = document.getElementById('cardTemplate');
+  
+  if (!container || !template) return;
+  
+  container.innerHTML = '';
+
+  gems.forEach(gem => {
+    const clone = template.content.cloneNode(true);
+    const card = clone.querySelector('.card');
+    
+    card.querySelector('.card-title').textContent = gem.title;
+    card.querySelector('.card-description').textContent = gem.description;
+    
+    const link = card.querySelector('.card-action');
+    link.href = gem.link;
+
+    const iconMap = {
+      'hotel': '🏨',
+      'analytics': '📊',
+      'security': '🛡️',
+      'support': '🛠️',
+      'cloud': '☁️',
+      'database': '🗄️',
+      'code': '💻',
+      'doc': '📄',
+      'finance': '💰',
+      'legal': '⚖️',
+      'people': '👥',
+      'mail': '✉️',
+      'star': '💎'
+    };
+    
+    const iconElement = card.querySelector('.card-icon');
+    if (iconElement) {
+      iconElement.textContent = iconMap[gem.icon] || '💎';
+    }
+
+    // Apply dynamic color if available
+    if (gem.color) {
+      card.style.setProperty('--card-accent-color', `var(--color-${gem.color})`);
+    } else {
+      card.style.setProperty('--card-accent-color', 'var(--color-gold)');
+    }
+
+    if (gem.status === 'upcoming') {
+      const badge = card.querySelector('.badge-upcoming');
+      if (badge) badge.classList.remove('hidden');
+      
+      card.classList.add('is-disabled');
+      link.innerHTML = '<span>Próximamente</span>';
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.5';
+    }
+
+    const btnSeeMore = card.querySelector('.btn-see-more');
+    if (btnSeeMore) {
+      btnSeeMore.addEventListener('click', () => openModal(gem));
+    }
+
+    container.appendChild(clone);
+  });
+}
+
+/**
+ * Hides the skeleton placeholders.
+ */
+function hideSkeletons() {
+  const skeletons = document.getElementById('skeletonsContainer');
+  const gemsContainer = document.getElementById('gemsContainer');
+  const headerSkeleton = document.getElementById('headerSkeleton');
+  const realBranding = document.getElementById('realBranding');
+  
+  if (skeletons) skeletons.classList.add('hidden');
+  if (gemsContainer) gemsContainer.classList.remove('hidden');
+  if (headerSkeleton) headerSkeleton.classList.add('hidden');
+  if (realBranding) realBranding.classList.remove('hidden');
+}
+
+/**
+ * Opens the modal with gem details.
+ * @param {Object} gem
+ */
+function openModal(gem) {
+  const modal = document.getElementById('gemModal');
+  const modalContent = modal.querySelector('.modal-content');
+  
+  if (modalContent) {
+    if (gem.color) {
+      modalContent.style.setProperty('--card-accent-color', `var(--color-${gem.color})`);
+    } else {
+      modalContent.style.setProperty('--card-accent-color', 'var(--color-gold)');
+    }
+  }
+
+  document.getElementById('modalTitle').textContent = gem.title;
+  
+  const descriptionContent = gem.fullDescription || gem.description || '';
+  document.getElementById('modalDescription').innerHTML = typeof marked !== 'undefined' ? marked.parse(descriptionContent) : descriptionContent;
+  
+  const instructionsContent = gem.instructions || 'No hay instrucciones específicas.';
+  document.getElementById('modalInstructions').innerHTML = typeof marked !== 'undefined' ? marked.parse(instructionsContent) : instructionsContent;
+  
+  document.getElementById('modalPrompt').textContent = gem.examplePrompt || 'No hay prompt de ejemplo.';
+  
+  const exploreBtn = document.getElementById('modalExploreBtn');
+  if (exploreBtn) {
+    exploreBtn.href = gem.link;
+    exploreBtn.style.setProperty('--card-accent-color', gem.color ? `var(--color-${gem.color})` : 'var(--color-gold)');
+    exploreBtn.style.display = (gem.status === 'upcoming') ? 'none' : 'flex';
+  }
+  
+  modal.classList.add('active');
+}
+
+/**
+ * Closes the modal.
+ */
+function closeModal() {
+  document.getElementById('gemModal').classList.remove('active');
+}
+
+/**
+ * Copies the example prompt to clipboard.
+ */
+function copyPrompt() {
+  const text = document.getElementById('modalPrompt').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+// Close modal on click outside
+window.addEventListener('click', (e) => {
+  const gemModal = document.getElementById('gemModal');
+  const adminModal = document.getElementById('adminModal');
+  if (e.target === gemModal) closeModal();
+  if (e.target === adminModal) closeAdminModal();
+});
+
+/**
+ * Opens the admin modal.
+ */
+function openAdminModal() {
+  const modal = document.getElementById('adminModal');
+  if (modal) modal.classList.add('active');
+}
+
+/**
+ * Closes the admin modal.
+ */
+function closeAdminModal() {
+  const modal = document.getElementById('adminModal');
+  if (modal) modal.classList.remove('active');
+  const form = document.getElementById('addGemForm');
+  if (form) form.reset();
+}
+
+/**
+ * Handles the submit event of the add gem form.
+ * @param {Event} event
+ */
+function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = submitBtn.querySelector('span');
+  
+  // Set loading state
+  submitBtn.disabled = true;
+  const originalText = btnText.textContent;
+  btnText.textContent = 'Guardando...';
+  
+  const formData = {
+    id: form.id.value.trim(),
+    title: form.title.value.trim(),
+    description: form.description.value.trim(),
+    fullDescription: form.fullDescription.value.trim(),
+    instructions: form.instructions.value.trim(),
+    examplePrompt: form.examplePrompt.value.trim(),
+    icon: form.icon.value,
+    color: form.color.value,
+    link: form.link.value.trim(),
+    status: form.status.value
+  };
+  
+  google.script.run
+    .withSuccessHandler((res) => {
+      // Restore button state
+      submitBtn.disabled = false;
+      btnText.textContent = originalText;
+      
+      // Close modal & reset form
+      closeAdminModal();
+      
+      // Alert and Reload dashboard
+      alert('¡Gema agregada con éxito!');
+      loadDashboard();
+    })
+    .withFailureHandler((err) => {
+      // Restore button state
+      submitBtn.disabled = false;
+      btnText.textContent = originalText;
+      
+      console.error('Error adding gem:', err);
+      alert('Error al guardar la gema: ' + err.message);
+    })
+    .addGemToSheet(formData);
+}
+</script>

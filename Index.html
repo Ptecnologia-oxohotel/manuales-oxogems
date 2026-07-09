@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>OxoGems</title>
+  <?!= include('Styles'); ?>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Marked Library for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <!-- Header Skeleton -->
+      <div id="headerSkeleton" class="header-skeleton skeleton">
+        <div class="skeleton-logo"></div>
+        <div class="skeleton-x"></div>
+        <div class="skeleton-brand-text"></div>
+      </div>
+
+      <!-- Real Branding (Initially Hidden) -->
+      <div id="realBranding" class="logo-container hidden">
+        <img id="brandLogo" src="" alt="OxoHotel Logo" style="opacity: 0;">
+        <span class="brand-connector">&times;</span>
+        <span class="brand-name">
+          <span class="brand-oxo">Oxo</span><span class="brand-gems">Gems</span>
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <button id="adminBtn" class="btn-admin hidden" title="Crear Gema">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Crear gema</span>
+        </button>
+        <?!= include('ThemeToggle'); ?>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main>
+      <div id="dashboardGrid" class="dashboard-grid">
+        
+        <!-- Skeleton Loading State -->
+        <div id="skeletonsContainer">
+          <div class="dashboard-grid">
+            <?!= include('SkeletonComponent'); ?>
+            <?!= include('SkeletonComponent'); ?>
+            <?!= include('SkeletonComponent'); ?>
+          </div>
+        </div>
+
+        <!-- Real Content (Initially Hidden) -->
+        <div id="gemsContainer" class="dashboard-grid hidden">
+          <!-- Cards will be injected here by Scripts.html -->
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer or additional info can go here -->
+  </div>
+
+  <!-- Modal -->
+  <div id="gemModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+      <h2 id="modalTitle" class="modal-title"></h2>
+      
+      <div class="modal-section">
+        <span class="modal-label">Descripción Detallada</span>
+        <p id="modalDescription" class="modal-text"></p>
+      </div>
+
+      <div class="modal-section">
+        <span class="modal-label">Protocolos e Instrucciones</span>
+        <p id="modalInstructions" class="modal-text"></p>
+      </div>
+
+      <div class="modal-section">
+        <span class="modal-label">Prompt de Ejemplo</span>
+        <div class="prompt-box">
+          <code id="modalPrompt"></code>
+          <button class="copy-btn" onclick="copyPrompt()">Copiar</button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a id="modalExploreBtn" href="#" target="_blank" class="btn-primary">
+          <span>Explorar Gema</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAdminModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+      <h2 class="modal-title" style="--card-accent-color: var(--color-gold);">Crear Nueva Gema</h2>
+      <p class="modal-description-sub" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        Agrega una nueva Gema a la intranet. La información se guardará automáticamente en la pestaña "Gemas" de Google Sheets.
+      </p>
+
+      <form id="addGemForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gemId">Identificador único (ID)</label>
+            <input type="text" id="gemId" name="id" class="form-input" placeholder="ej: gem-4" required>
+          </div>
+          <div class="form-group">
+            <label for="gemTitle">Título de la Gema</label>
+            <input type="text" id="gemTitle" name="title" class="form-input" placeholder="ej: Sentinela Financiero" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="gemDescription">Descripción Corta</label>
+          <input type="text" id="gemDescription" name="description" class="form-input" placeholder="Se muestra en la tarjeta principal" required>
+        </div>
+
+        <div class="form-group">
+          <label for="gemFullDescription">Descripción Detallada (Markdown)</label>
+          <textarea id="gemFullDescription" name="fullDescription" class="form-textarea" placeholder="Se muestra en los detalles principales del modal" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="gemInstructions">Protocolos e Instrucciones (Markdown)</label>
+          <textarea id="gemInstructions" name="instructions" class="form-textarea" placeholder="ej: **Archivos a adjuntar:**\n* Archivo..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="gemExamplePrompt">Prompt de Ejemplo (Texto plano)</label>
+          <textarea id="gemExamplePrompt" name="examplePrompt" class="form-textarea" style="font-family: monospace;" placeholder="El prompt que se copiará directamente al portapapeles" required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gemIcon">Ícono</label>
+            <select id="gemIcon" name="icon" class="form-select">
+              <option value="analytics">📊 Analíticas (analytics)</option>
+              <option value="security">🛡️ Seguridad (security)</option>
+              <option value="hotel">🏨 Hotel (hotel)</option>
+              <option value="support">🛠️ Soporte (support)</option>
+              <option value="cloud">☁️ Nube (cloud)</option>
+              <option value="database">🗄️ Base de Datos (database)</option>
+              <option value="code">💻 Programación (code)</option>
+              <option value="doc">📄 Documento (doc)</option>
+              <option value="finance">💰 Finanzas (finance)</option>
+              <option value="legal">⚖️ Legal (legal)</option>
+              <option value="people">👥 Personal (people)</option>
+              <option value="mail">✉️ Correo (mail)</option>
+              <option value="star">💎 Estrella (default)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="gemColor">Color Acento</label>
+            <select id="gemColor" name="color" class="form-select">
+              <option value="gold">Dorado (gold)</option>
+              <option value="blue">Azul (blue)</option>
+              <option value="green">Verde (green)</option>
+              <option value="red">Rojo (red)</option>
+              <option value="purple">Morado (purple)</option>
+              <option value="teal">Turquesa (teal)</option>
+              <option value="orange">Naranja (orange)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gemLink">Enlace Gemini</label>
+            <input type="url" id="gemLink" name="link" class="form-input" placeholder="https://gemini.google.com/..." required>
+          </div>
+          <div class="form-group">
+            <label for="gemStatus">Estado</label>
+            <select id="gemStatus" name="status" class="form-select">
+              <option value="active">Activo (active)</option>
+              <option value="upcoming">Próximamente (upcoming)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 1.5rem; padding-top: 1rem;">
+          <button type="button" class="btn-see-more" onclick="closeAdminModal()">Cancelar</button>
+          <button type="submit" id="submitBtn" class="btn-primary" style="border: none; cursor: pointer; --card-accent-color: var(--color-gold);">
+            <span>Guardar Gema</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Component Templates -->
+  <?!= include('CardComponent'); ?>
+
+  <!-- Core Scripts -->
+  <?!= include('Scripts'); ?>
+
+</body>
+</html>

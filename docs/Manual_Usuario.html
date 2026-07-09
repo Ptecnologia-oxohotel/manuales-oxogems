@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OxoGems · Manual de Usuario</title>
+<style>
+  :root{
+    --color-gold:#C19528; --color-blue:#49677A; --color-green:#5F6D5F;
+    --color-red:#D96570; --color-purple:#9B72CB; --color-teal:#3F9A9F; --color-orange:#E07A5F;
+    --bg-body:#F8F9FA; --bg-card:#FFFFFF; --text-main:#333; --text-muted:#666;
+    --border-color:#E0E0E0; --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI',Roboto,Inter,-apple-system,sans-serif;
+    background:var(--bg-body); color:var(--text-main); margin:0; line-height:1.65;
+  }
+  .layout{display:flex; max-width:1200px; margin:0 auto;}
+  nav.toc{
+    width:250px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:2rem 1rem; border-right:1px solid var(--border-color); background:var(--bg-card);
+  }
+  nav.toc h2{font-size:0.85rem; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin:0 0 1rem;}
+  nav.toc a{display:block; padding:0.4rem 0.6rem; border-radius:8px; color:var(--text-main); text-decoration:none; font-size:0.9rem; margin-bottom:0.15rem;}
+  nav.toc a:hover{background:var(--bg-body); color:var(--color-gold);}
+  main{flex:1; padding:2.5rem 3rem; max-width:900px;}
+  h1{font-size:2.1rem; margin-bottom:0.25rem;}
+  .subtitle{color:var(--text-muted); margin-bottom:2rem; font-size:1rem;}
+  h2{
+    font-size:1.4rem; margin-top:3rem; padding-top:1rem; border-top:1px solid var(--border-color);
+    color:var(--color-gold);
+  }
+  h2:first-of-type{border-top:none; margin-top:1rem;}
+  h3{font-size:1.1rem; margin-top:1.75rem;}
+  p{margin:0.75rem 0;}
+  ul, ol{margin:0.75rem 0; padding-left:1.4rem;}
+  li{margin-bottom:0.4rem;}
+  .card{
+    background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius);
+    padding:1.25rem 1.5rem; margin:1.25rem 0; box-shadow:0 2px 6px rgba(0,0,0,0.04);
+  }
+  .note{border-left:4px solid var(--color-teal);}
+  .warn{border-left:4px solid var(--color-red);}
+  .tip{border-left:4px solid var(--color-green);}
+  .card strong.label{
+    display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:.5px;
+    color:var(--text-muted); margin-bottom:0.35rem;
+  }
+  figure{margin:1.5rem 0;}
+  figure img{
+    max-width:100%; border-radius:var(--radius); border:1px solid var(--border-color);
+    box-shadow:0 4px 10px rgba(0,0,0,0.07); display:block;
+  }
+  figcaption{font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; text-align:center;}
+  code, .kbd{
+    background:#EFEFEF; border-radius:4px; padding:0.1rem 0.4rem; font-family:'Courier New',monospace; font-size:0.9em;
+  }
+  table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.92rem;}
+  th, td{border:1px solid var(--border-color); padding:0.6rem 0.8rem; text-align:left; vertical-align:top;}
+  th{background:#F1F1F1; font-weight:700;}
+  .badge{
+    display:inline-block; font-size:0.7rem; font-weight:700; text-transform:uppercase;
+    padding:0.15rem 0.55rem; border-radius:20px; color:#fff; margin-left:0.4rem;
+  }
+  .badge.admin{background:var(--color-gold);}
+  .badge.user{background:var(--color-blue);}
+  footer{
+    margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--border-color);
+    color:var(--text-muted); font-size:0.85rem;
+  }
+  @media (max-width: 900px){
+    .layout{flex-direction:column;}
+    nav.toc{position:static; height:auto; width:100%;}
+    main{padding:1.5rem;}
+  }
+  @media print{
+    nav.toc{display:none;}
+    .layout{display:block;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc">
+    <h2>Contenido</h2>
+    <a href="#intro">1. ¿Qué es OxoGems?</a>
+    <a href="#acceso">2. Acceso a la plataforma</a>
+    <a href="#interfaz">3. Interfaz general</a>
+    <a href="#explorar">4. Explorar las Gemas</a>
+    <a href="#detalles">5. Ver detalles y copiar el prompt</a>
+    <a href="#usar-gema">6. Usar una Gema en Gemini</a>
+    <a href="#tema">7. Modo claro / oscuro</a>
+    <a href="#admin">8. Panel de administrador</a>
+    <a href="#faq">9. Preguntas frecuentes</a>
+    <a href="#soporte">10. Soporte</a>
+  </nav>
+
+  <main>
+    <h1>OxoGems</h1>
+    <p class="subtitle">Manual de Usuario · Intranet de Gemas de IA de OxoHotel</p>
+
+    <section id="intro">
+      <h2>1. ¿Qué es OxoGems?</h2>
+      <p>
+        <strong>OxoGems</strong> es la intranet interna de OxoHotel que reúne, en un solo lugar,
+        todas las <strong>Gemas</strong> (asistentes personalizados de Google Gemini) creadas para
+        automatizar y auditar procesos internos, principalmente relacionados con conciliación
+        financiera, nómina y dispersión de pagos.
+      </p>
+      <p>
+        Cada tarjeta del panel representa una Gema especializada: un asistente de inteligencia
+        artificial ya configurado con instrucciones, protocolos y formato de salida específicos
+        para una tarea puntual. OxoGems no reemplaza a Gemini; es la puerta de entrada organizada
+        para encontrar la Gema correcta y saber exactamente cómo usarla.
+      </p>
+    </section>
+
+    <section id="acceso">
+      <h2>2. Acceso a la plataforma</h2>
+      <p>
+        OxoGems es una aplicación web publicada desde Google Apps Script. Se accede desde el
+        enlace de la intranet de OxoHotel con tu cuenta de <strong>Google Workspace corporativa</strong>
+        (correo <code>@oxohotel.com</code>). No requiere instalación ni usuario/contraseña adicional.
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/acceso_intranet.png" alt="Acceso desde la intranet de OxoHotel">
+        <figcaption>Acceso a OxoGems desde el módulo de la intranet corporativa.</figcaption>
+      </figure>
+      <div class="card note">
+        <strong class="label">Nota</strong>
+        Si es la primera vez que abres la aplicación, tu navegador puede pedirte confirmar la
+        cuenta de Google con la que quieres continuar. Elige siempre tu cuenta corporativa de OxoHotel.
+      </div>
+    </section>
+
+    <section id="interfaz">
+      <h2>3. Interfaz general</h2>
+      <p>
+        Al abrir OxoGems, la aplicación muestra primero una animación de carga
+        (<em>skeleton loading</em>) mientras obtiene la información desde el servidor. Esto toma
+        alrededor de un segundo.
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/skeleton_loading.png" alt="Pantalla de carga con efecto skeleton">
+        <figcaption>Estado de carga inicial mientras se obtienen las Gemas disponibles.</figcaption>
+      </figure>
+      <p>Una vez cargada, la pantalla principal se compone de:</p>
+      <ul>
+        <li><strong>Encabezado:</strong> logo de OxoHotel + OxoGems, botón para cambiar de tema (claro/oscuro) y, si aplica, el botón <em>Crear gema</em>.</li>
+        <li><strong>Panel principal:</strong> una cuadrícula de tarjetas, una por cada Gema disponible.</li>
+      </ul>
+      <figure>
+        <img src="../Imagenes_manuales/inicio_usuario_normal.png" alt="Vista principal para un usuario colaborador">
+        <figcaption>Vista principal para un usuario colaborador (sin permisos de administración).</figcaption>
+      </figure>
+    </section>
+
+    <section id="explorar">
+      <h2>4. Explorar las Gemas</h2>
+      <p>Cada tarjeta de Gema muestra:</p>
+      <ul>
+        <li>Un ícono y un color distintivo según su categoría.</li>
+        <li>El <strong>título</strong> de la Gema.</li>
+        <li>Una <strong>descripción corta</strong> de su propósito.</li>
+        <li>Dos botones: <code>Detalles</code> y <code>Explorar</code>.</li>
+      </ul>
+      <table>
+        <tr><th>Botón</th><th>Qué hace</th></tr>
+        <tr><td><code>Detalles</code></td><td>Abre una ventana con la descripción completa, las instrucciones de uso y un prompt de ejemplo listo para copiar.</td></tr>
+        <tr><td><code>Explorar</code></td><td>Abre directamente la Gema en Gemini en una nueva pestaña, lista para usarse.</td></tr>
+      </table>
+      <div class="card tip">
+        <strong class="label">Gema "Próximamente"</strong>
+        Algunas tarjetas pueden mostrar la etiqueta <em>Próximamente</em>. Significa que la Gema
+        está anunciada pero aún no está disponible para uso; el botón <code>Explorar</code>
+        aparece deshabilitado hasta que el administrador la active.
+      </div>
+    </section>
+
+    <section id="detalles">
+      <h2>5. Ver detalles y copiar el prompt</h2>
+      <p>
+        Al presionar <code>Detalles</code> se abre una ventana modal con toda la información
+        necesaria para usar la Gema correctamente:
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/gema1.png" alt="Ventana de detalle de una Gema">
+        <figcaption>Ejemplo de ventana de detalle: descripción, instrucciones y prompt de ejemplo.</figcaption>
+      </figure>
+      <ul>
+        <li><strong>Descripción Detallada:</strong> explica en profundidad qué hace la Gema y cómo razona.</li>
+        <li><strong>Protocolos e Instrucciones:</strong> indica qué archivos adjuntar (por ejemplo, el archivo TXT bancario o los PDF de nómina) antes de ejecutar la Gema.</li>
+        <li><strong>Prompt de Ejemplo:</strong> el texto exacto que debes pegar en Gemini junto con tus archivos. Usa el botón <code>Copiar</code> para copiarlo al portapapeles.</li>
+        <li><strong>Explorar Gema:</strong> botón inferior que abre la Gema en Gemini.</li>
+      </ul>
+      <div class="card note">
+        <strong class="label">Recomendación de uso</strong>
+        <ol>
+          <li>Abre <code>Detalles</code> y revisa qué archivos necesitas adjuntar.</li>
+          <li>Presiona <code>Copiar</code> para copiar el prompt de ejemplo.</li>
+          <li>Presiona <code>Explorar Gema</code> (o el botón <code>Explorar</code> de la tarjeta).</li>
+          <li>En Gemini, adjunta los archivos solicitados y pega el prompt copiado.</li>
+          <li>Reemplaza los valores entre corchetes <code>[Insertar Valor]</code> por los datos reales antes de enviar.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="usar-gema">
+      <h2>6. Usar una Gema en Gemini</h2>
+      <p>
+        Cada Gema es, en realidad, un enlace directo a una configuración de Gemini creada por el
+        equipo de Tecnología de OxoHotel. Al presionar <code>Explorar</code>, Gemini se abrirá con
+        las instrucciones del asistente ya cargadas: solo debes adjuntar los archivos indicados
+        y pegar el prompt correspondiente para obtener el resultado (por ejemplo, un dictamen de
+        conciliación o un reporte de discrepancias).
+      </p>
+      <div class="card warn">
+        <strong class="label">Importante</strong>
+        Verifica siempre que los archivos que adjuntas correspondan al periodo y hotel correctos
+        antes de ejecutar la Gema. Las Gemas de auditoría financiera son sensibles a errores de
+        fecha, monto e identidad, ya que estos datos alimentan directamente el dictamen final.
+      </div>
+    </section>
+
+    <section id="tema">
+      <h2>7. Modo claro / oscuro</h2>
+      <p>
+        El botón con el ícono de sol/luna, ubicado en la esquina superior derecha, permite alternar
+        entre modo claro y modo oscuro. La preferencia se guarda en el navegador, por lo que se
+        mantendrá en tus próximas visitas desde el mismo equipo.
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/inicio_usuario_normal_modo_oscuro.png" alt="Vista principal en modo oscuro">
+        <figcaption>Vista principal en modo oscuro.</figcaption>
+      </figure>
+    </section>
+
+    <section id="admin">
+      <h2>8. Panel de administrador <span class="badge admin">Solo administrador</span></h2>
+      <p>
+        El usuario administrador de la plataforma (<code>ptecnologia@oxohotel.com</code>) cuenta
+        con un botón adicional, <strong>Crear gema</strong>, visible únicamente para esa cuenta.
+        Los demás colaboradores no ven este botón ni pueden agregar Gemas.
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/inicio_admin.png" alt="Vista principal con permisos de administrador">
+        <figcaption>Vista principal con el botón "Crear gema" visible (sesión de administrador).</figcaption>
+      </figure>
+      <h3>Crear una nueva Gema</h3>
+      <p>Al presionar <strong>Crear gema</strong> se abre un formulario con los siguientes campos:</p>
+      <figure>
+        <img src="../Imagenes_manuales/modal_crear_gema.png" alt="Formulario para crear una nueva Gema">
+        <figcaption>Formulario de creación de una nueva Gema.</figcaption>
+      </figure>
+      <table>
+        <tr><th>Campo</th><th>Descripción</th></tr>
+        <tr><td>Identificador único (ID)</td><td>Código interno de la Gema, por ejemplo <code>gem-4</code>. No puede repetirse.</td></tr>
+        <tr><td>Título de la Gema</td><td>Nombre visible en la tarjeta.</td></tr>
+        <tr><td>Descripción Corta</td><td>Texto breve que aparece en la tarjeta principal.</td></tr>
+        <tr><td>Descripción Detallada</td><td>Texto en formato Markdown que se muestra en la ventana de detalles.</td></tr>
+        <tr><td>Protocolos e Instrucciones</td><td>Markdown con los archivos o pasos previos requeridos.</td></tr>
+        <tr><td>Prompt de Ejemplo</td><td>Texto plano que el usuario copiará y pegará en Gemini.</td></tr>
+        <tr><td>Ícono / Color Acento</td><td>Apariencia visual de la tarjeta.</td></tr>
+        <tr><td>Enlace Gemini</td><td>URL de la Gema publicada en Gemini.</td></tr>
+        <tr><td>Estado</td><td><code>Activo</code> (disponible) o <code>Próximamente</code> (anunciada, aún no disponible).</td></tr>
+      </table>
+      <p>
+        Al guardar, la nueva Gema se agrega automáticamente a la pestaña <strong>"Gemas"</strong>
+        de la hoja de cálculo de Google Sheets que alimenta la plataforma, y el panel principal se
+        actualiza de inmediato mostrando la nueva tarjeta.
+      </p>
+      <figure>
+        <img src="../Imagenes_manuales/inicio_modo_oscuro_admin.png" alt="Vista de administrador en modo oscuro">
+        <figcaption>Panel de administrador en modo oscuro, con el botón "Crear gema" disponible.</figcaption>
+      </figure>
+      <div class="card warn">
+        <strong class="label">Importante</strong>
+        Todos los campos marcados como obligatorios deben completarse; de lo contrario, el sistema
+        rechazará el guardado. Si el ID ingresado ya existe, la aplicación mostrará un mensaje de
+        error y no se duplicará la Gema.
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>9. Preguntas frecuentes</h2>
+      <p><strong>¿Por qué no veo el botón "Crear gema"?</strong><br>
+      Porque la creación de Gemas está restringida al usuario administrador de la plataforma.</p>
+      <p><strong>¿Puedo editar o eliminar una Gema desde OxoGems?</strong><br>
+      No. Desde la interfaz solo se pueden crear Gemas nuevas. Para editar o eliminar una existente,
+      el administrador debe hacerlo directamente en la hoja de cálculo "Gemas" en Google Sheets.</p>
+      <p><strong>El prompt de ejemplo no se copió al portapapeles, ¿qué hago?</strong><br>
+      Verifica que tu navegador tenga permisos de acceso al portapapeles para este sitio, o
+      selecciona y copia manualmente el texto dentro del cuadro de prompt.</p>
+      <p><strong>Una Gema no responde como espero, ¿el problema es de OxoGems?</strong><br>
+      OxoGems solo muestra la información y el enlace de la Gema; la ejecución ocurre dentro de
+      Gemini. Revisa que hayas adjuntado los archivos correctos y sigas el prompt tal como se indica.</p>
+    </section>
+
+    <section id="soporte">
+      <h2>10. Soporte</h2>
+      <p>
+        Para reportar errores, solicitar la creación de una nueva Gema o solicitar acceso,
+        contacta al equipo de Tecnología de OxoHotel: <code>ptecnologia@oxohotel.com</code>.
+      </p>
+    </section>
+
+    <footer>
+      OxoGems · Manual de Usuario · OxoHotel
+    </footer>
+  </main>
+</div>
+</body>
+</html>
